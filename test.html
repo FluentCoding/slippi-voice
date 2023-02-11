@@ -1,0 +1,20 @@
+<script>
+(async () => {
+    await new Promise(res => {
+        const check = () => {
+          if (!window.Gluon) return setTimeout(check, 100);
+          res();
+        };
+
+        check();
+    });
+
+    Gluon.ipc.on('audio_pos', pos => {
+        x.textContent = pos.x
+        y.textContent = pos.y
+    });
+})()
+</script>
+
+<div id="x">0.0</div>
+<div id="y">0.0</div>
