@@ -23,7 +23,7 @@ export class SlippiEventEmitter extends TypedEmitter<{
         this.liveStream.connection.on("statusChange", (status: number) => {
             if (status === 0) {
                 console.log("Disconnected from the relay.");
-                // handle auto reconnect
+                // reconnect
                 this.connect();
             }
         });
@@ -50,8 +50,11 @@ export class SlippiEventEmitter extends TypedEmitter<{
         console.log("Game started!");
         this.isDirectOrUnranked(gameStart);
         this.currentGame = {
+            // WIP, will be changed later
             youPort: 0,
             otherPort: 1
+            /*youPort: gameStart.players.find((p) => p.connectCode === "FLCD#507")?.playerIndex!,
+            otherPort: gameStart.players.find((p) => p.connectCode !== "FLCD#507")?.playerIndex!*/
         };
     }
 
@@ -61,12 +64,14 @@ export class SlippiEventEmitter extends TypedEmitter<{
     }
 
     private onFrame(frame: FrameEntryType) {
-        const you = frame.players[0]!;
-        const other = frame.players[1]!;
+        if (!this.currentGame) return;
+        const you = frame.players[this.currentGame.youPort]!;
+        const other = frame.players[this.currentGame.otherPort]!;
         
         const youPosition = [you.post.positionX!, you.post.positionY!];
         const otherPosition = [other.post.positionX!, other.post.positionY!];
         
+        // calculate positional difference from other player to you
         const delta = youPosition.map((v, i) => otherPosition[i] - v);
         
         this.emit("audio_pos", {

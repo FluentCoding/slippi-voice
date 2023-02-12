@@ -7,7 +7,7 @@
     "dev": "tsc && node build/backend"
   },
   "dependencies": {
-    "@gluon-framework/gluon": "0.11.0",
+    "@gluon-framework/gluon": "https://github.com/gluon-framework/gluon",
     "@slippi/slippi-js": "^6.6.1",
     "@vinceau/slp-realtime": "^3.3.0",
     "rxjs": "^6.6.7"
