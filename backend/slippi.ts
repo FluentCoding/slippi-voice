@@ -1,5 +1,6 @@
 import { FrameEntryType, GameEndType, GameStartType, SlpLiveStream } from "@vinceau/slp-realtime";
 import find from 'find-process';
+import { setIntervalAsync } from "set-interval-async";
 import { CatchAllEventEmitter } from './util/catch_all_event_emitter.js';
 
 interface CurrentGame {
@@ -12,8 +13,6 @@ export interface SlippiEvents {
     'connection_status': (status: number) => void;
 }
 
-const SLIPPI_DOLPHIN_REGEX = new RegExp("Slippi Dolphin")
-
 export class SlippiEventEmitter extends CatchAllEventEmitter<SlippiEvents> {
     private liveStream: SlpLiveStream;
     private currentGame?: CurrentGame;
@@ -22,36 +21,36 @@ export class SlippiEventEmitter extends CatchAllEventEmitter<SlippiEvents> {
         super();
 
         this.liveStream = new SlpLiveStream("dolphin", {
-            outputFiles: false,
-            suppressErrors: true
+            outputFiles: false
         });
         this.connect();
         this.liveStream.connection.on("statusChange", (status: number) => {
             if (status === 0) {
                 console.log("Disconnected from the relay.");
-                // reconnect
-                this.connect();
+                // safe reconnect (we allow enet to clean up for 1 sec, most efficient solution despite being a bit janky)
+                setTimeout(this.connect.bind(this), 1000);
             } else {
                 this.emit("connection_status", status);
             }
         });
-        
+        this.liveStream.connection.on("error", console.log)
         this.liveStream.gameStart$.subscribe(this.onGameStart.bind(this));
         this.liveStream.gameEnd$.subscribe(this.onGameEnd.bind(this));
         this.liveStream.playerFrame$.subscribe(this.onFrame.bind(this));
 
         // Find process routine in case dolphin gets closed and the livestream isn't being closed properly so it keeps showing "Connected"
-        setInterval(() => {
+        setIntervalAsync(async () => {
             // Isn't "connected"?
             if (this.liveStream.connection.getStatus() !== 2) return;
 
-            // Check if process is still running
-            find("name", SLIPPI_DOLPHIN_REGEX, false).then((data) => {
-                // Slippi isn't running?
-                if (data.length === 0)
-                    this.liveStream.connection.disconnect();
-            })
-        }, 3000)
+            // Check if process is still running (on my system, takes ~500-600ms per call)
+            const process = await find("name", "Slippi Dolphin.exe", true);
+
+            // Slippi isn't running? (check status again in case it disconnected during the time we searched for the process)
+            if (process.length === 0 && this.liveStream.connection.getStatus() === 2) {
+                this.liveStream.connection.disconnect();
+            }
+        }, 2000);
     }
 
     private connect() {
@@ -59,11 +58,12 @@ export class SlippiEventEmitter extends CatchAllEventEmitter<SlippiEvents> {
             .then(() => {
                 console.log("Connected!");
             })
-            .catch(() => {
-                try {
-                    // manually ensure that the connection is closed to trigger a reconnect
-                    this.liveStream.connection.disconnect();
-                } catch(e) {}
+            .catch((err: Error) => {
+                if (err.message.startsWith("Timed out")) {
+                    console.log("Timed out. Reconnecting...");
+                } else {
+                    console.log(err);
+                }
             });
     }
 

@@ -14,7 +14,8 @@
     "@vinceau/slp-realtime": "^3.3.0",
     "@zerodevx/svelte-toast": "^0.8.2",
     "find-process": "^1.4.7",
-    "rxjs": "^6.6.7"
+    "rxjs": "^6.6.7",
+    "set-interval-async": "^3.0.3"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
