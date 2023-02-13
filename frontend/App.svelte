@@ -12,7 +12,6 @@
   }
 
   let connectionState: ConnectionState = ConnectionState.CONNECTING;
-  //let startNetplayLock = false;
 
   IPCHandler.on("connection_status", (status) => {
     connectionState = status;

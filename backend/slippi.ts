@@ -8,6 +8,8 @@ interface CurrentGame {
     otherPort: number;
 }
 
+const SLIPPI_DOLPHIN_REGEX = new RegExp("Slippi Dolphin")
+
 export class SlippiEventEmitter extends TypedEmitter<IPCApi> {
     private liveStream: SlpLiveStream;
     private currentGame?: CurrentGame;
@@ -40,12 +42,12 @@ export class SlippiEventEmitter extends TypedEmitter<IPCApi> {
             if (this.liveStream.connection.getStatus() !== 2) return;
 
             // Check if process is still running
-            find("name", /Slippi Dolphin/, false).then((data) => {
+            find("name", SLIPPI_DOLPHIN_REGEX, false).then((data) => {
                 // Slippi isn't running?
                 if (data.length === 0)
                     this.liveStream.connection.disconnect();
             })
-        }, 1000)
+        }, 5000)
     }
 
     private connect() {
