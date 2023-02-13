@@ -4,18 +4,31 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "tsc && node build/backend"
+    "build": "vite build",
+    "dev": "env NODE_ENV=development concurrently \"vite\" \"tsc && node build\" --kill-others",
+    "run": "yarn build && node build"
   },
   "dependencies": {
     "@gluon-framework/gluon": "https://github.com/gluon-framework/gluon",
     "@slippi/slippi-js": "^6.6.1",
     "@vinceau/slp-realtime": "^3.3.0",
+    "@zerodevx/svelte-toast": "^0.8.2",
+    "find-process": "^1.4.7",
     "rxjs": "^6.6.7"
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.0.2",
     "@types/node": "^18.13.0",
+    "autoprefixer": "^10.4.13",
+    "concurrently": "^7.6.0",
+    "postcss": "^8.4.21",
+    "svelte": "^3.55.1",
+    "svelte-check": "^3.0.3",
+    "svelte-preprocess": "^5.0.1",
+    "tailwindcss": "^3.2.6",
     "tiny-typed-emitter": "^2.1.0",
     "tsc": "^2.0.4",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "vite": "^4.1.1"
   }
 }

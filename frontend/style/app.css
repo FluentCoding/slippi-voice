@@ -1,0 +1,13 @@
+@font-face {
+    font-family: "Figtree";
+    src: url("figtree.ttf") format("truetype-variations");
+  }
+
+:root {
+    font-family: Figtree;
+    user-select: none;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

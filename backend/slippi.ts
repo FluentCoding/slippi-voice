@@ -1,14 +1,14 @@
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { FrameEntryType, GameEndType, GameStartType, SlpLiveStream } from "@vinceau/slp-realtime";
+import { IPCApi } from './ipc';
+import find from 'find-process';
 
 interface CurrentGame {
     youPort: number;
     otherPort: number;
 }
 
-export class SlippiEventEmitter extends TypedEmitter<{
-    'audio_pos': ({x, y}: {x: number, y: number}) => void;
-}> {
+export class SlippiEventEmitter extends TypedEmitter<IPCApi> {
     private liveStream: SlpLiveStream;
     private currentGame?: CurrentGame;
 
@@ -25,12 +25,27 @@ export class SlippiEventEmitter extends TypedEmitter<{
                 console.log("Disconnected from the relay.");
                 // reconnect
                 this.connect();
+            } else {
+                this.emit("connection_status", status);
             }
         });
         
         this.liveStream.gameStart$.subscribe(this.onGameStart.bind(this));
         this.liveStream.gameEnd$.subscribe(this.onGameEnd.bind(this));
         this.liveStream.playerFrame$.subscribe(this.onFrame.bind(this));
+
+        // Find process routine in case dolphin gets closed and the livestream isn't being closed properly so it keeps showing "Connected"
+        setInterval(() => {
+            // Isn't "connected"?
+            if (this.liveStream.connection.getStatus() !== 2) return;
+
+            // Check if process is still running
+            find("name", /Slippi Dolphin/, false).then((data) => {
+                // Slippi isn't running?
+                if (data.length === 0)
+                    this.liveStream.connection.disconnect();
+            })
+        }, 1000)
     }
 
     private connect() {
