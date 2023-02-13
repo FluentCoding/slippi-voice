@@ -1,16 +1,20 @@
-import { TypedEmitter } from 'tiny-typed-emitter';
 import { FrameEntryType, GameEndType, GameStartType, SlpLiveStream } from "@vinceau/slp-realtime";
-import { IPCApi } from './ipc';
 import find from 'find-process';
+import { CatchAllEventEmitter } from './util/catch_all_event_emitter.js';
 
 interface CurrentGame {
     youPort: number;
     otherPort: number;
 }
 
+export interface SlippiEvents {
+    'audio_pos': ({x, y}: {x: number, y: number}) => void;
+    'connection_status': (status: number) => void;
+}
+
 const SLIPPI_DOLPHIN_REGEX = new RegExp("Slippi Dolphin")
 
-export class SlippiEventEmitter extends TypedEmitter<IPCApi> {
+export class SlippiEventEmitter extends CatchAllEventEmitter<SlippiEvents> {
     private liveStream: SlpLiveStream;
     private currentGame?: CurrentGame;
 
@@ -47,7 +51,7 @@ export class SlippiEventEmitter extends TypedEmitter<IPCApi> {
                 if (data.length === 0)
                     this.liveStream.connection.disconnect();
             })
-        }, 5000)
+        }, 3000)
     }
 
     private connect() {

@@ -19,9 +19,4 @@ const window = await Gluon.open(isDev ? 'http://127.0.0.1:1420' : '../dist/index
 
 // Start Slippi background procedure
 const slippi = new SlippiEventEmitter();
-slippi.on("audio_pos", (audioPos) => {
-  window.ipc.send("audio_pos", audioPos);
-});
-slippi.on("connection_status", (status) => {
-  window.ipc.send("connection_status", status);
-});
+slippi.onAny(window.ipc.send);

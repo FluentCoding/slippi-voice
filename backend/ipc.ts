@@ -1,4 +1,3 @@
-export interface IPCApi {
-    'audio_pos': ({x, y}: {x: number, y: number}) => void;
-    'connection_status': (status: number) => void;
-}
+import { SlippiEvents } from "./slippi";
+
+export type IPCApi = SlippiEvents & {}
