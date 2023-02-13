@@ -2,47 +2,21 @@
   import ConnectionStateComponent from "./components/ConnectionStateComponent.svelte";
   import { ConnectionState } from "./types";
   import Description from './static/Description.svelte'
-  import { startDolphin } from "./util/dolphin";
   import { SvelteToast, type SvelteToastOptions } from '@zerodevx/svelte-toast'
-  import { IPCHandler } from './util/ipc'
+  import { IPCHandler } from './api/ipc'
+  import { AudioManager } from './util/audio'
 
+  const audioManager = new AudioManager();
   const toastOptions: SvelteToastOptions = {
     duration: 5000
   }
 
   let connectionState: ConnectionState = ConnectionState.CONNECTING;
-  let startNetplayLock = false;
+  //let startNetplayLock = false;
 
   IPCHandler.on("connection_status", (status) => {
     connectionState = status;
   })
-
-  let startNetplay = async () => {
-    startNetplayLock = true;
-    connectionState = ConnectionState.CONNECTING;
-    try {
-      await startDolphin();
-    } finally {
-      startNetplayLock = false
-    }
-  };
-
-  /*const dolphinConnection = new DolphinConnection();
-  dolphinConnection
-    .connect("localhost", Ports.DEFAULT)
-    .then(() => {
-      console.log("Successfully connected!");
-      startNetplayLock = true;
-      connectionState = ConnectionState.CONNECTED;
-    })
-    .catch(console.error);
-  
-  dolphinConnection.on("statusChange", (status) => {
-    if (status === SlippiConnectionStatus.DISCONNECTED) {
-      startNetplayLock = false;
-      connectionState = ConnectionState.NOT_CONNECTED;
-    }
-  })*/
 </script>
 
 <SvelteToast options={toastOptions} />
@@ -53,9 +27,6 @@
   </div>
   <div class="flex-auto" />
   <div class="text-center flex flex-col gap-2">
-    <button disabled={startNetplayLock} on:click={startNetplay} class={`text-sm bg-gray-800 w-full py-4 rounded-xl border-2 disabled:opacity-50 enabled:hover:border-green-300`}>
-      Start netplay
-    </button>
     <ConnectionStateComponent state={connectionState} />
   </div>
 </main>

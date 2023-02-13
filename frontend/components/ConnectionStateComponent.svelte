@@ -5,15 +5,15 @@
 
   const connectionStateConfig = {
     [ConnectionState.NOT_CONNECTED]: {
-      title: "Not connected to dolphin",
+      title: "Not connected to Dolphin",
       color: "border-red-400"
     },
     [ConnectionState.CONNECTING]: {
-      title: "Connecting",
+      title: "Connecting to Dolphin",
       color: "border-yellow-400"
     },
     [ConnectionState.CONNECTED]: {
-      title: "Connected",
+      title: "Connected to Dolphin",
       color: "border-emerald-400"
     }
   }

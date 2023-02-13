@@ -1,11 +1,11 @@
 @font-face {
-    font-family: "Figtree";
-    src: url("figtree.ttf") format("truetype-variations");
-  }
+  font-family: "Figtree";
+  src: url("figtree.ttf") format("truetype-variations");
+}
 
 :root {
-    font-family: Figtree;
-    user-select: none;
+  font-family: Figtree;
+  user-select: none;
 }
 
 @tailwind base;

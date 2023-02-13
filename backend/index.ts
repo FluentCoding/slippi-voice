@@ -4,14 +4,14 @@ import { SlippiEventEmitter } from './slippi.js';
 const isDev: boolean = process.env.NODE_ENV === "development";
 const window = await Gluon.open(isDev ? 'http://127.0.0.1:1420' : '../dist/index.html', {
   allowHTTP: isDev,
-  // @ts-ignore
-  windowSize: [ 800, 500 ]
+  // TODO set this to min size
+  windowSize: [ 400, 600 ]
 });
 
+// Close wrapper to ensure that closing the browser also stops the nodejs process
 var _close = window.close;
 window.close = () => {
   _close();
-  // Now, we can stop the entire script
   process.exit();
 };
 
