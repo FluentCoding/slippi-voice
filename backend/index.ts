@@ -8,12 +8,14 @@ const window = await Gluon.open(isDev ? 'http://127.0.0.1:1420' : '../dist/index
   windowSize: [ 400, 600 ]
 });
 
-// Close wrapper to ensure that closing the browser also stops the nodejs process
-var _close = window.close;
-window.close = () => {
-  _close();
-  process.exit();
-};
+{
+  // Close wrapper to ensure that closing the browser also stops the nodejs process
+  const _close = window.close;
+  window.close = () => {
+    _close();
+    process.exit();
+  };
+}
 
 // Start Slippi background procedure
 const slippi = new SlippiEventEmitter();
